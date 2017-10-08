@@ -7,8 +7,8 @@ class element():
         self.n1 = n1
         self.n2 = n2
         self.value = value
-    def spice_print(self):
-        print( '{0}{1} {2} {3} {4}'.format(self.type,self.id,self.n1, self.n2, self.value))
+    def spice(self):
+        return('{0}{1} {2} {3} {4}'.format(self.type,self.id,self.n1, self.n2, self.value))
         
         
 class circuit():
@@ -31,23 +31,38 @@ class circuit():
     def spice_print(self):
         print(self.name)
         for e in self.dict_component.values():
-            e.spice_print()
+            print(e.spice())
         print('.end')
+    def save(self,filename):
+        f = open(filename,'w')
+        f.write(self.name + '\n')
+        for e in self.dict_component.values():
+            f.write(e.spice()+'\n' )
+        f.write('.end')
+        f.close()    
     def capacitor(self):
         """ return the list of all the capacitor of the circuit """
         return [ e for e in self.dict_component.values() if e.type=='C']
     def inductor(self):
         """ return the list of all the inductor of the circuit """
         return [e for e in self.dict_component.values() if e.type=='L']
-            
-            
+
+def load_circuit(filename):
+    with open(filename) as f:
+        lines = f.read().splitlines()
+    c = circuit(lines[0])
+    for i in range(1, len(lines) - 1):
+        u = lines[i].split(' ')
+        name = u[0]
+        e = element(u[0][0], u[0][1], u[1], u[2], u[3])
+        c.add_element(u[0],e)
+    return c        
 if __name__=='__main__':
     e = element('R',1, 0,1,1e3)
-    e.spice_print()
+    print(e.spice())
     c = circuit('Example of circuit')
     c.C(1,0,1,350e-6)
     c.L(1,0,1,2)
     c.R(1,0,1,1)
     c.spice_print()
-    for l in c.inductor():
-        l.spice_print()
+    c.save('test.txt')
