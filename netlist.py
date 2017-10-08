@@ -85,3 +85,4 @@ if __name__=='__main__':
     c.spice_print()
     c.save('test.txt')
     C_graph = c.capacitor_graph()
+
